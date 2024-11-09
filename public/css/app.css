@@ -1,0 +1,227 @@
+/* 1. Use a more-intuitive box-sizing model */
+*, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  /* 2. Remove default margin */
+  * {
+    margin: 0;
+  }
+
+  body {
+    /* 3. Add accessible line-height */
+    line-height: 1.5;
+    /* 4. Improve text rendering */
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* 5. Improve media defaults */
+  img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* 6. Inherit fonts for form controls */
+  input, button, textarea, select {
+    font: inherit;
+  }
+
+  /* 7. Avoid text overflows */
+  p, h1, h2, h3, h4, h5, h6 {
+    overflow-wrap: break-word;
+  }
+
+  /* 8. Improve line wrapping */
+  p {
+    text-wrap: pretty;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
+  }
+
+  /*
+    9. Create a root stacking context
+  */
+  #root, #__next {
+    isolation: isolate;
+  }
+
+
+body {
+    width: 100%;
+    height: 100vh;
+    background-color: #cfcfcf;
+}
+
+.container {
+    width: 100%;
+    min-height: 100%;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container h1 {
+    color: #ff6600;
+    font-size: 3rem;
+    font-weight: bolder;
+}
+
+
+.box {
+    width: 60%;
+    min-height: 60%;
+    margin: 1rem;
+    display: flex;
+
+    justify-content: center;
+    flex-direction: column;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+
+}
+.box-header {
+    text-align: center;
+}
+
+.box-header p {
+    color: #414141;
+    font-size: 1.5rem;
+    font-weight: bolder;
+
+}
+
+.box-body {
+    flex: 1;
+    margin: 1rem;
+    display: flex;
+}
+
+.box-body > div {
+    flex: 1;
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.box-body > div:last-child {
+    border-left: 1px solid #d6d6d6;
+    padding-left: 1rem;
+}
+
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.form-row > div {
+    flex: 1;
+}
+
+.full-width {
+    flex: 0 0 100%;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+
+.slot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .slot:last-child {
+    border-bottom: none;
+  }
+
+  .date-time {
+    font-weight: bold;
+  }
+
+  .seats {
+    color: #555;
+  }
+
+  .full {
+    color: #d9534f; /* Red color for full slots */
+    font-weight: bold;
+  }
+
+  .button-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .margin-15 {
+    margin: 15px;
+  }
+
+  .button-link {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff; /* Blue button color */
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+
+  .flex {
+    display: flex;
+  }
+
+  .flex-grow {
+    flex: 1;
+  }
+
+  .flex-column {
+    flex-direction: column;
+  }
+
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+
+  th, td {
+    border: 1px solid #dddddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }

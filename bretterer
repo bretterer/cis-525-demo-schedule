@@ -1,0 +1,294 @@
+#!/usr/bin/env php
+<?php
+
+require_once 'vendor/autoload.php';
+
+use Carbon\Carbon;
+use Dotenv\Dotenv;
+use function Laravel\Prompts\info;
+use function Laravel\Prompts\select;
+use function Laravel\Prompts\text;
+
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+
+if ($argc < 2) {
+    echo "Usage: php bretterer [command]\n";
+    exit(1);
+}
+
+$command = $argv[1];
+
+switch ($command) {
+    case 'migrate':
+        runMigrations();
+        break;
+
+    case 'migrate:rollback':
+        runRollbackMigrations();
+        break;
+
+    case 'availability:add':
+        addAvailability();
+        break;
+
+    case 'availablity:remove':
+        removeAvailability();
+        break;
+
+    default:
+        echo "Invalid command: " . $command . "\n";
+        exit(1);
+}
+
+function addAvailability()
+{
+    $date = text(
+        label: 'What date do you want to set availability for?',
+        placeholder: 'E.g. Dec 5, 2024'
+    );
+
+    $start = text(
+        label: 'What time does the availability start?',
+        placeholder: 'E.g. 9:00 AM'
+    );
+
+    $end = text(
+        label: 'What time does the availability end?',
+        placeholder: 'E.g. 5:00 PM'
+    );
+
+
+    $seats = text(
+        label: 'How many seats are available?',
+        placeholder: 'E.g. 10'
+    );
+
+    $date = Carbon::parse($date);
+
+    $start = $date->clone()
+        ->setTimeFromTimeString(Carbon::parse($start)->format('H:i:s'))
+        ->format('Y-m-d H:i:s');
+
+    $end = $date->clone()
+        ->setTimeFromTimeString(Carbon::parse($end)->format('H:i:s'))
+        ->format('Y-m-d H:i:s');
+
+    $seats = (int) $seats;
+
+    try {
+        $conn = connectToDatabase();
+
+        $stmt = $conn->prepare("INSERT INTO availability ( start_time, end_time, available_seats) VALUES (?, ?, ?)");
+        $stmt->bind_param("ssi", $start, $end, $seats);
+        $stmt->execute();
+    } catch (Exception $e) {
+        echo "Error adding availability: " . $e->getMessage() . "\n";
+        return;
+    }
+
+    info("Availability added successfully!");
+
+
+
+
+}
+
+function removeAvailability()
+{
+    $availabilities = getAvailabilities();
+
+
+
+    $availability = select(
+        label: 'Which availability would you like to remove?',
+        options: array_column($availabilities, 'start_time', 'id')
+    );
+
+
+    try {
+        $conn = connectToDatabase();
+
+        $stmt = $conn->prepare("DELETE FROM availability WHERE id = ?");
+        $stmt->bind_param("i", $availability);
+        $stmt->execute();
+    } catch (Exception $e) {
+        echo "Error removing availability: " . $e->getMessage() . "\n";
+        return;
+    }
+
+    info("Availability removed successfully!");
+}
+
+
+function getAvailabilities()
+{
+    $conn = connectToDatabase();
+
+    $sql = "SELECT * FROM availability WHERE start_time >= NOW()";
+    $result = $conn->query($sql);
+
+    $availabilities = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $availabilities[] = [
+            'id' => $row['id'],
+            'start_time' => $row['start_time'],
+            'end_time' => $row['end_time'],
+            'available_seats' => $row['available_seats'],
+        ];
+    }
+
+    return $availabilities;
+}
+
+
+
+function runMigrations()
+{
+
+    $conn = connectToDatabase();
+
+
+
+    // Run the init_db migration first
+    $initDbMigration = require 'migrations/00000000_000000_init_db.php';
+    $initDbMigration->setConnection($conn);
+    $initDbMigration->up();
+    $initDbMigration->build();
+    echo "Migrated: 00000000_000000_init_db.php\n";
+
+    recordMigration($conn, '00000000_000000_init_db', 1);
+
+    // Then run the rest of the migrations
+    $batch = getCurrentBatch($conn);
+    $migrationFiles = scandir('migrations/');
+    sort($migrationFiles); // Sort files by name (timestamp)
+
+
+    foreach ($migrationFiles as $file) {
+        if ($file !== '.' && $file !== '..' && !str_contains($file, 'init_db')) {
+            $migrationName = pathinfo($file, PATHINFO_FILENAME);
+
+            if (!migrationExists($conn, $migrationName)) {
+                require_once 'migrations/' . $file;
+                $migration = require 'migrations/' . $file;
+
+                try {
+                    $conn->begin_transaction();
+                    $migration->up();
+                    $migration->setConnection($conn);
+                    recordMigration($conn, $migrationName, $batch + 1);
+                    $migration->build();
+                    $conn->commit();
+                    echo "Migrated: " . $file . "\n";
+                } catch (Exception $e) {
+                    $conn->rollback();
+                    echo "Error migrating: " . $file . ". Rolling back.\n";
+                    echo "Error message: " . $e->getMessage() . "\n";
+                    return; // Stop execution on error
+                }
+            }
+        }
+    }
+
+    $conn->close();
+}
+
+function runRollbackMigrations()
+{
+    $conn = connectToDatabase();
+
+    $batch = getCurrentBatch($conn);
+
+    if ($batch == 0) {
+        echo "No migrations to rollback.\n";
+        return;
+    }
+
+    $migrationFiles = getMigrationsByBatch($conn, $batch);
+
+    foreach ($migrationFiles as $migrationName) {
+        require_once 'migrations/' . $migrationName . '.php';
+        $migration = require 'migrations/' . $migrationName . '.php';
+
+        try {
+            $conn->begin_transaction();
+            $migration->setConnection($conn);
+            $migration->down();
+            deleteMigration($conn, $migrationName);
+            $migration->rollback();
+            $conn->commit();
+            echo "Rolled back: " . $migrationName . ".php\n";
+        } catch (Exception $e) {
+            $conn->rollback();
+            echo "Error rolling back: " . $migrationName . ".php. Rolling back.\n";
+            echo "Error message: " . $e->getMessage() . "\n";
+            return; // Stop execution on error
+        }
+    }
+
+    $conn->close();
+}
+
+function getCurrentBatch($conn)
+{
+    $sql = "SELECT MAX(batch) FROM migrations";
+    $result = $conn->query($sql);
+    $row = $result->fetch_assoc();
+    return $row['MAX(batch)'] ?? 0;
+}
+
+function migrationExists($conn, $migrationName)
+{
+    $stmt = $conn->prepare("SELECT id FROM migrations WHERE migration = ?");
+    $stmt->bind_param("s", $migrationName);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->num_rows > 0;
+}
+
+function recordMigration($conn, $migrationName, $batch)
+{
+    $stmt = $conn->prepare("INSERT INTO migrations (migration, batch) VALUES (?, ?)");
+    $stmt->bind_param("si", $migrationName, $batch);
+    $stmt->execute();
+}
+
+function getMigrationsByBatch($conn, $batch)
+{
+    $stmt = $conn->prepare("SELECT migration FROM migrations WHERE batch = ? ORDER BY id DESC");
+    $stmt->bind_param("i", $batch);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $migrations = [];
+    while ($row = $result->fetch_assoc()) {
+        $migrations[] = $row['migration'];
+    }
+    return $migrations;
+}
+
+function deleteMigration($conn, $migrationName)
+{
+    $stmt = $conn->prepare("DELETE FROM migrations WHERE migration = ?");
+    $stmt->bind_param("s", $migrationName);
+    $stmt->execute();
+}
+
+
+function connectToDatabase(): mysqli
+{
+    $conn = new mysqli(
+        $_ENV['DB_HOST'],
+        $_ENV['DB_USER'],
+        $_ENV['DB_PASS'],
+        $_ENV['DB_NAME']
+    );
+
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    return $conn;
+}

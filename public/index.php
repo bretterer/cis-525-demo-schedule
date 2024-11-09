@@ -9,7 +9,7 @@ $sql = "SELECT a.id, a.start_time, a.end_time, a.available_seats, (a.available_s
         LEFT JOIN bookings b ON a.id = b.timeslot
         WHERE a.start_time > NOW()
         GROUP BY a.id, a.start_time, a.end_time, a.available_seats
-        HAVING remaining_seats > 0";
+        ORDER BY a.start_time ASC";
 
 $stmt = $db->prepare($sql);
 $stmt->execute();
@@ -43,24 +43,33 @@ $stmt->close();
             <div class="box-header">
                 <h1 class="text-center">Welcome to Demo Scheduling System</h1>
                 <p>Register to demo your project below</p>
-                <?php if (isset($_SESSION['error'])) : ?>
-                    <div class="alert alert-danger">
+                <div class="booking-response">
+                    <?php if (isset($_SESSION['error'])) : ?>
+                        <div class="alert alert-danger">
                         <p><?php echo $_SESSION['error']['text']; ?></p>
-                        <code><?php echo $_SESSION['error']['message']; ?></code>
-                    </div>
-                <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
 
-                <?php if (isset($_SESSION['booking'])) : ?>
-                    <div class="alert alert-success">
-                        <p>Booking successful!</p>
-                        <p>First Name: <?php echo $_SESSION['booking']['first_name']; ?></p>
-                        <p>Last Name: <?php echo $_SESSION['booking']['last_name']; ?></p>
-                        <p>Email: <?php echo $_SESSION['booking']['email']; ?></p>
-                        <p>UMID: <?php echo $_SESSION['booking']['umid']; ?></p>
-                        <p>Project Title: <?php echo $_SESSION['booking']['project_title']; ?></p>
-                        <p>Timeslot: <?php echo Carbon::parse($availabilities[$_SESSION['booking']['timeslot'] - 1]['start_time'])->format('F j, Y - g:i a'); ?></p>
-                    </div>
-                <?php endif; ?>
+                    <?php if (isset($_SESSION['booking'])) : ?>
+                        <div class="alert alert-success">
+                            <p>Booking successful!</p>
+                            <div class="flex flex-column">
+                                <p>Name: <span><?php echo $_SESSION['booking']['first_name']; ?> <?php echo $_SESSION['booking']['last_name']; ?></span></p>
+                                <p>Email: <span><?php echo $_SESSION['booking']['email']; ?></span></p>
+                                <p>UMID: <span><?php echo $_SESSION['booking']['umid']; ?></span></p>
+                                <p>Project Title: <span><?php echo $_SESSION['booking']['project_title']; ?></span></p>
+                            </div>
+                            <?php
+                            //get the timeslot based on id
+                            $timeslot = array_search($_SESSION['booking']['timeslot'], array_column($availabilities, 'id'));
+                            ?>
+                            <div class="flex flex-column">
+                                <p>Timeslot: </p>
+                                <span><?php echo Carbon::parse($availabilities[$timeslot]['start_time'])->format('F j, Y - g:i a'); ?></span>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
             <div class="box-body">
                 <div class="form-container">
@@ -68,39 +77,54 @@ $stmt->close();
                         <div class="flex-grow">
                             <div class="form-row">
                                 <div>
-                                    <label for="firstName">First Name:</label>
+                                    <label for="firstName">First Name: *</label>
                                     <input type="text" id="firstName" name="firstName" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['first_name'] . '"'; ?>>
+                                    <?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['firstName'])) : ?>
+                                        <div class="input-error"><?php echo $_SESSION['errors']['firstName']; ?></div>
+                                    <?php endif; ?>
                                 </div>
                                 <div>
-                                    <label for="lastName">Last Name:</label>
+                                    <label for="lastName">Last Name: *</label>
                                     <input type="text" id="lastName" name="lastName" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['last_name'] . '"'; ?>>
+                                    <?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['lastName'])) : ?>
+                                        <div class="input-error"><?php echo $_SESSION['errors']['lastName']; ?></div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
                             <div class="form-row">
                                 <div>
-                                    <label for="email">Email:</label>
+                                    <label for="email">Email: *</label>
                                     <input type="email" id="email" name="email" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['email'] . '"'; ?>>
+                                    <?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['email'])) : ?>
+                                        <div class="input-error"><?php echo $_SESSION['errors']['email']; ?></div>
+                                    <?php endif; ?>
                                 </div>
                                 <div>
-                                    <label for="umid">UMID:</label>
+                                    <label for="umid">UMID: *</label>
                                     <input type="text" id="umid" name="umid" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['umid'] . '"'; ?>>
+                                    <?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['umid'])) : ?>
+                                        <div class="input-error"><?php echo $_SESSION['errors']['umid']; ?></div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
                             <div class="form-row full-width">
                                 <div>
-                                    <label for="project">Project Title:</label>
+                                    <label for="project">Project Title: *</label>
                                     <input type="text" id="project" name="project" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['project_title'] . '"'; ?>>
+                                    <?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['project'])) : ?>
+                                        <div class="input-error"><?php echo $_SESSION['errors']['project']; ?></div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
 
                             <div class="form-row full-width">
                                 <div>
-                                    <label for="timeslot">Timeslot:</label>
+                                    <label for="timeslot">Timeslot: *</label>
                                     <select id="timeslot" name="timeslot">
-                                        <option value="">Select a Time</option>
+                                        <option value="2">Select a Time</option>
                                         <?php
                                         foreach ($availabilities as $availability) {
                                             $start = Carbon::parse($availability['start_time'])->format('F j, Y - g:i a');
@@ -113,19 +137,22 @@ $stmt->close();
                                         ?>
 
                                     </select>
+                                    <?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['timeslot'])) : ?>
+                                        <div class="input-error"><?php echo $_SESSION['errors']['timeslot']; ?></div>
+                                    <?php endif; ?>
                                 </div>
 
                             </div>
 
-                            <div class="form-row full-width">
+                            <div class="full-width">
 
-                            <?php if (isset($_SESSION['error']) && $_SESSION['error']['e']->getCode() == 1062) : ?>
-                                <div class="alert alert-danger">You have already booked a slot</div>
-                                <div>
-                                    <input type="checkbox" id="override" name="override">
-                                    <label for="override">Replace your booking with this one</label>
-                                </div>
-                            <?php endif; ?>
+                                <?php if (isset($_SESSION['error']) && $_SESSION['error']['e']->getCode() == 1062) : ?>
+                                    <div class="alert alert-danger">You have already booked a slot</div>
+                                    <div class="flex flex-row align-center">
+                                        <input type="checkbox" id="override" name="override" class="inherit-width">
+                                        <label for="override" class="pl-10 no-margin flex-grow">Replace your booking with this one</label>
+                                    </div>
+                                <?php endif; ?>
 
                             </div>
                         </div>
@@ -172,5 +199,6 @@ $stmt->close();
 
 // clear session
 unset($_SESSION['error']);
+unset($_SESSION['errors']);
 unset($_SESSION['booking']);
 unset($_SESSION['old_data']);

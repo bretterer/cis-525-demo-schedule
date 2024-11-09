@@ -205,6 +205,51 @@ input, textarea, select {
     flex-direction: column;
   }
 
+  .flex-row {
+    flex-direction: row;
+  }
+
+  .pl-10 {
+    padding-left: 10px;
+  }
+
+  .no-margin {
+    margin: 0;
+  }
+
+  .inherit-width {
+    width: inherit;
+  }
+
+  .align-center {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .booking-response {
+    margin-top: 20px;
+
+  }
+
+  .booking-response p {
+    font-size: 1.2rem;
+  }
+
+  .booking-response > p:first-child {
+    margin-top: 10px;
+  }
+
+  .booking-response p span {
+    font-weight: normal;
+  }
+
+  .inline-block {
+    display: inline-block;
+  }
+  .inline {
+    display: inline;
+  }
+
 
   table {
     width: 100%;
@@ -224,4 +269,27 @@ input, textarea, select {
 
   tr:nth-child(even) {
     background-color: #f9f9f9;
+  }
+
+  .alert {
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+  }
+
+  .alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+  }
+
+  .alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+  }
+
+  .input-error {
+    color: red
   }

@@ -2,6 +2,10 @@
 
 require __DIR__ . '/app.php';
 
+unset($_SESSION['error']);
+unset($_SESSION['errors']);
+unset($_SESSION['booking']);
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $firstName = $_POST['firstName'];

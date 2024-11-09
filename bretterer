@@ -33,7 +33,7 @@ switch ($command) {
         addAvailability();
         break;
 
-    case 'availablity:remove':
+    case 'availability:remove':
         removeAvailability();
         break;
 

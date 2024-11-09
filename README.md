@@ -14,3 +14,11 @@ Installation:
 5. copy `.env.example` to `.env` and update environment variables
 6. run `php bretterer migrate`
 7. visit website
+
+
+Add Availability Slots:
+1. from the root directory, run `php bretterer availability:add` and follow prompts
+
+Remove Availability Slots:
+1. from the root directory, run `php bretterer availability:remove` and follow prompts
+

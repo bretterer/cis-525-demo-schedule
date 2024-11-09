@@ -250,6 +250,11 @@ input, textarea, select {
     display: inline;
   }
 
+  input.has-error,
+  select.has-error {
+    border-color: red;
+  }
+
 
   table {
     width: 100%;

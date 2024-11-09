@@ -78,14 +78,14 @@ $stmt->close();
                             <div class="form-row">
                                 <div>
                                     <label for="firstName">First Name: *</label>
-                                    <input type="text" id="firstName" name="firstName" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['first_name'] . '"'; ?>>
+                                    <input  class="<?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['firstName'])) echo 'has-error'; ?>" type="text" id="firstName" name="firstName" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['first_name'] . '"'; ?>>
                                     <?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['firstName'])) : ?>
                                         <div class="input-error"><?php echo $_SESSION['errors']['firstName']; ?></div>
                                     <?php endif; ?>
                                 </div>
                                 <div>
                                     <label for="lastName">Last Name: *</label>
-                                    <input type="text" id="lastName" name="lastName" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['last_name'] . '"'; ?>>
+                                    <input class="<?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['lastName'])) echo 'has-error'; ?>" type="text" id="lastName" name="lastName" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['last_name'] . '"'; ?>>
                                     <?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['lastName'])) : ?>
                                         <div class="input-error"><?php echo $_SESSION['errors']['lastName']; ?></div>
                                     <?php endif; ?>
@@ -95,14 +95,14 @@ $stmt->close();
                             <div class="form-row">
                                 <div>
                                     <label for="email">Email: *</label>
-                                    <input type="email" id="email" name="email" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['email'] . '"'; ?>>
+                                    <input class="<?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['email'])) echo 'has-error'; ?>" type="email" id="email" name="email" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['email'] . '"'; ?>>
                                     <?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['email'])) : ?>
                                         <div class="input-error"><?php echo $_SESSION['errors']['email']; ?></div>
                                     <?php endif; ?>
                                 </div>
                                 <div>
                                     <label for="umid">UMID: *</label>
-                                    <input type="text" id="umid" name="umid" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['umid'] . '"'; ?>>
+                                    <input class="<?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['umid'])) echo 'has-error'; ?>" type="text" id="umid" name="umid" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['umid'] . '"'; ?>>
                                     <?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['umid'])) : ?>
                                         <div class="input-error"><?php echo $_SESSION['errors']['umid']; ?></div>
                                     <?php endif; ?>
@@ -112,14 +112,14 @@ $stmt->close();
                             <div class="form-row">
                                 <div>
                                     <label for="project">Project Title: *</label>
-                                    <input type="text" id="project" name="project" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['project_title'] . '"'; ?>>
+                                    <input class="<?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['project'])) echo 'has-error'; ?>" type="text" id="project" name="project" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['project_title'] . '"'; ?>>
                                     <?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['project'])) : ?>
                                         <div class="input-error"><?php echo $_SESSION['errors']['project']; ?></div>
                                     <?php endif; ?>
                                 </div>
                                 <div>
                                     <label for="phoneNumber">Phone Number: *</label>
-                                    <input type="text" id="phoneNumber" name="phoneNumber" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['phone_number'] . '"'; ?>>
+                                    <input class="<?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['phoneNumber'])) echo 'has-error'; ?>" type="text" id="phoneNumber" name="phoneNumber" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['phone_number'] . '"'; ?>>
                                     <?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['phoneNumber'])) : ?>
                                         <div class="input-error"><?php echo $_SESSION['errors']['phoneNumber']; ?></div>
                                     <?php endif; ?>
@@ -130,7 +130,7 @@ $stmt->close();
                             <div class="form-row full-width">
                                 <div>
                                     <label for="timeslot">Timeslot: *</label>
-                                    <select id="timeslot" name="timeslot">
+                                    <select id="timeslot" name="timeslot" class="<?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['timeslot'])) echo 'has-error'; ?>">
                                         <option value="">Select a Time</option>
                                         <?php
                                         foreach ($availabilities as $availability) {

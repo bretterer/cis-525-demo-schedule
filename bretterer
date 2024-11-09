@@ -151,15 +151,17 @@ function runMigrations()
     $conn = connectToDatabase();
 
 
+    // Check if the migrations table exists
+    if (!migrationExists($conn, '00000000_000000_init_db')) {
+        // Run the init_db migration first
+        $initDbMigration = require 'migrations/00000000_000000_init_db.php';
+        $initDbMigration->setConnection($conn);
+        $initDbMigration->up();
+        $initDbMigration->build();
+        echo "Migrated: 00000000_000000_init_db.php\n";
 
-    // Run the init_db migration first
-    $initDbMigration = require 'migrations/00000000_000000_init_db.php';
-    $initDbMigration->setConnection($conn);
-    $initDbMigration->up();
-    $initDbMigration->build();
-    echo "Migrated: 00000000_000000_init_db.php\n";
-
-    recordMigration($conn, '00000000_000000_init_db', 1);
+        recordMigration($conn, '00000000_000000_init_db', 1);
+    }
 
     // Then run the rest of the migrations
     $batch = getCurrentBatch($conn);

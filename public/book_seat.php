@@ -9,6 +9,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $email = $_POST['email'];
     $umid = $_POST['umid'];
+    $phoneNumber = $_POST['phoneNumber'];
     $projectTitle = $_POST['project'];
     $timeslot = $_POST['timeslot']; // Note: 'country' is used for timeslot in the form
 
@@ -17,6 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         'last_name' => $lastName,
         'email' => $email,
         'umid' => $umid,
+        'phone_number' => $phoneNumber,
         'project_title' => $projectTitle,
         'timeslot' => $timeslot
     ];
@@ -34,8 +36,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
     }
 
-    $stmt = $db->prepare("INSERT INTO bookings (first_name, last_name, email, umid, project_title, timeslot) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssssi", $firstName, $lastName, $email, $umid, $projectTitle, $timeslot);
+    $stmt = $db->prepare("INSERT INTO bookings (first_name, last_name, email, phone_number, umid, project_title, timeslot) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssi", $firstName, $lastName, $email, $phoneNumber, $umid, $projectTitle, $timeslot);
 
 
 
@@ -48,6 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             'last_name' => $lastName,
             'email' => $email,
             'umid' => $umid,
+            'phone_number' => $phoneNumber,
             'project_title' => $projectTitle,
             'timeslot' => $timeslot
         ];
@@ -99,6 +102,15 @@ function validateSubmission($data, $db)
 
     if (empty($data['umid'])) {
         $errors['umid'] = 'UMID is required';
+    }
+
+    if (empty($data['phoneNumber'])) {
+        $errors['phoneNumber'] = 'Phone number is required';
+    }
+
+    // validate that phone number is a valid phone number: valid format is 123-456-7890
+    if (!preg_match("/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/", $data['phoneNumber'])) {
+        $errors['phoneNumber'] = 'Invalid phone number format, valid format is 123-456-7890';
     }
 
     if (empty($data['project'])) {

@@ -10,6 +10,7 @@ $sql = "SELECT
             b.last_name,
             b.email,
             b.umid,
+            b.phone_number,
             b.project_title,
             a.start_time,
             a.end_time
@@ -62,6 +63,7 @@ $stmt->close();
                             <th>Email</th>
                             <th>UMID</th>
                             <th>Project Title</th>
+                            <th>Phone Number</th>
                             <th>Timeslot</th>
                         </tr>
                     </thead>
@@ -74,6 +76,7 @@ $stmt->close();
                                     <td><?php echo $booking['email']; ?></td>
                                     <td><?php echo $booking['umid']; ?></td>
                                     <td><?php echo $booking['project_title']; ?></td>
+                                    <td><?php echo $booking['phone_number']; ?></td>
                                     <td><?php echo Carbon::parse($booking['start_time'])->format('F j, Y g:i A'); ?> ( <?php echo Carbon::parse($booking['start_time'])->diffInMinutes(Carbon::parse($booking['end_time'])); ?> minutes )</td>
                                 </tr>
                             <?php endforeach; ?>

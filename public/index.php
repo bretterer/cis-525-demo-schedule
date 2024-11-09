@@ -109,12 +109,19 @@ $stmt->close();
                                 </div>
                             </div>
 
-                            <div class="form-row full-width">
+                            <div class="form-row">
                                 <div>
                                     <label for="project">Project Title: *</label>
                                     <input type="text" id="project" name="project" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['project_title'] . '"'; ?>>
                                     <?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['project'])) : ?>
                                         <div class="input-error"><?php echo $_SESSION['errors']['project']; ?></div>
+                                    <?php endif; ?>
+                                </div>
+                                <div>
+                                    <label for="phoneNumber">Phone Number: *</label>
+                                    <input type="text" id="phoneNumber" name="phoneNumber" <?php if (isset($_SESSION['old_data'])) echo 'value="' . $_SESSION['old_data']['phone_number'] . '"'; ?>>
+                                    <?php if (isset($_SESSION['errors']) && isset($_SESSION['errors']['phoneNumber'])) : ?>
+                                        <div class="input-error"><?php echo $_SESSION['errors']['phoneNumber']; ?></div>
                                     <?php endif; ?>
                                 </div>
                             </div>

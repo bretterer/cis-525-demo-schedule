@@ -202,7 +202,7 @@ $stmt->close();
 
 </html>
 
-<?
+<?php
 
 // clear session
 unset($_SESSION['error']);

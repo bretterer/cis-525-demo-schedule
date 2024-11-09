@@ -131,7 +131,7 @@ $stmt->close();
                                 <div>
                                     <label for="timeslot">Timeslot: *</label>
                                     <select id="timeslot" name="timeslot">
-                                        <option value="2">Select a Time</option>
+                                        <option value="">Select a Time</option>
                                         <?php
                                         foreach ($availabilities as $availability) {
                                             $start = Carbon::parse($availability['start_time'])->format('F j, Y - g:i a');
